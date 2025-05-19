@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate Blog Post - YouTube to Blog</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .loading {
+            display: none;
+        }
+        .loading.active {
+            display: flex;
+        }
+        .prose h1 {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 1em;
+            color: #1a365d;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 0.5em;
+        }
+        .prose h3 {
+            font-size: 1.5em;
+            font-weight: 600;
+            margin-top: 1.5em;
+            margin-bottom: 0.75em;
+            color: #2563eb;
+        }
+        .prose p {
+            font-size: 1.1em;
+            line-height: 1.7;
+            color: #374151;
+            margin-bottom: 1em;
+        }
+        .prose strong {
+            color: #1a365d;
+        }
+        .gradient-text {
+            background: linear-gradient(120deg, #2563eb, #4f46e5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex-shrink-0">
+                    <a href="/" class="text-2xl font-bold gradient-text">YouTube to Blog</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-8">
+        <header class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">Generate Your Blog Post</h1>
+            <p class="text-xl text-gray-600">Paste your YouTube video URL below to get started</p>
+        </header>
+
+        <div class="max-w-2xl mx-auto bg-white rounded-xl shadow-sm p-8 mb-8">
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-blue-700 mb-2">How to Generate a Blog Post</h2>
+                <ol class="list-decimal list-inside text-gray-700 space-y-2">
+                    <li>Copy the URL of the YouTube video you want to convert into a blog post.</li>
+                    <li>Paste the URL in the input box below.</li>
+                    <li>Click <span class="font-semibold text-blue-700">Generate Blog Post</span>.</li>
+                    <li>Wait 50-60 seconds while our AI works its magic (do 15 pushups while you wait!).</li>
+                    <li>View, copy, or download your generated blog post below.</li>
+                </ol>
+            </div>
+            <form id="blogForm" class="space-y-6">
+                <div>
+                    <label for="youtubeUrl" class="block text-sm font-medium text-gray-700 mb-2">YouTube Video URL</label>
+                    <input type="url" id="youtubeUrl" name="youtubeUrl" required
+                        class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-gray-500"
+                        placeholder="https://www.youtube.com/watch?v=...">
+                </div>
+                <button type="submit"
+                    class="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-[1.02]">
+                    Generate Blog Post
+                </button>
+            </form>
+        </div>
+
+        <div class="loading items-center justify-center space-x-3">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+            <span class="text-gray-600 text-lg">Generating your blog post...<br><span class='block text-blue-700 font-semibold'>This will take 50-60 seconds. While you wait, do 15 pushups! 💪</span></span>
+        </div>
+
+        <div id="result" class="max-w-4xl mx-auto bg-white rounded-xl shadow-sm p-8 hidden">
+            <div id="blogContent" class="prose prose-lg max-w-none"></div>
+            <div class="mt-8 flex justify-end space-x-4">
+                <button onclick="copyToClipboard()" 
+                    class="bg-gray-100 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors">
+                    Copy to Clipboard
+                </button>
+                <button onclick="downloadAsMarkdown()" 
+                    class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors">
+                    Download as Markdown
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('blogForm');
+        const loading = document.querySelector('.loading');
+        const result = document.getElementById('result');
+        const blogContent = document.getElementById('blogContent');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const youtubeUrl = document.getElementById('youtubeUrl').value;
+
+            // Show loading state
+            loading.classList.add('active');
+            result.classList.add('hidden');
+
+            try {
+                const response = await fetch('/api/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ youtube_url: youtubeUrl }),
+                });
+
+                const text = await response.text();
+                if (!text) {
+                    alert('No response from server. Please try again later.');
+                    loading.classList.remove('active');
+                    return;
+                }
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch (e) {
+                    alert('Invalid response from server. Please try again later.');
+                    loading.classList.remove('active');
+                    return;
+                }
+
+                if (data.success) {
+                    // Convert markdown to HTML using marked
+                    blogContent.innerHTML = marked.parse(data.blog_post);
+                    result.classList.remove('hidden');
+                } else {
+                    alert(data.error || 'An error occurred');
+                }
+            } catch (error) {
+                alert('An error occurred while generating the blog post');
+            } finally {
+                loading.classList.remove('active');
+            }
+        });
+
+        function copyToClipboard() {
+            const text = blogContent.innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Blog post copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+            });
+        }
+
+        function downloadAsMarkdown() {
+            const text = blogContent.innerText;
+            const blob = new Blob([text], { type: 'text/markdown' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'blog-post.md';
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        }
+    </script>
+</body>
+</html> 
