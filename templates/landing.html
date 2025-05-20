@@ -6,6 +6,14 @@
     <title>YouTube to Blog - Transform Videos into Articles</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-XXXXXXXXXX');
+    </script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -63,6 +71,28 @@
                         </div>
                     </div>
                 </main>
+            </div>
+        </div>
+    </div>
+
+    <!-- Demo Video Section -->
+    <div class="max-w-4xl mx-auto mt-12 mb-16 px-4">
+        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl">
+            <div class="p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">See It in Action</h2>
+                <p class="text-lg text-gray-600 mb-6">Watch how our tool transforms a YouTube video into a well-structured blog post in minutes. Experience the magic of AI-powered content transformation!</p>
+                <div class="aspect-w-16 aspect-h-9">
+                    <iframe 
+                        class="w-full h-[400px] rounded-lg"
+                        src="https://www.youtube-nocookie.com/embed/8P23ce9TGGw"
+                        title="YouTube video player"
+                        frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        referrerpolicy="strict-origin-when-cross-origin"
+                        allowfullscreen>
+                    </iframe>
+                    <div class="text-center text-gray-500 mt-2">If the video doesn't load, please check your network or try a different browser.</div>
+                </div>
             </div>
         </div>
     </div>
