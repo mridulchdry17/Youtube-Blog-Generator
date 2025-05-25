@@ -1,65 +1,82 @@
-# YouTube to Blog Generator
+# 🎥📄 YouTube to Blog Generator
 
-A web application that converts YouTube videos into well-structured blog posts using AI. The application uses Flask for the backend, modern UI with Tailwind CSS, and Ollama for AI text generation.
+A Flask-based web app that **generates structured blog posts** from any YouTube video URL using **LangChain**, **Groq (Gemma2-9b-it)**, and **LLM prompt engineering**. Ideal for turning educational or technical videos into well-formed written content.
 
-## Features
+---
 
-- Convert YouTube videos to blog posts
-- Modern, responsive UI
-- Real-time blog post generation
-- Copy to clipboard functionality
-- Loading states and error handling
+## 🌐  Demo
+Watch this video to see **how this project works**:  
+👉 [Project Demo Video](https://www.youtube.com/watch?v=8P23ce9TGGw)
 
-## Prerequisites
 
-- Python 3.8 or higher
-- Ollama installed and running locally
-- pip (Python package manager)
+---
 
-## Installation
+## 🛠️ Tech Stack
 
-1. Clone the repository:
+- **Flask** – for backend web routing
+- **LangChain** – to load and process YouTube transcripts
+- **Groq (Gemma2-9b-it)** – as the LLM to generate content
+- **RecursiveCharacterTextSplitter** – for chunking long transcripts
+- **HTML/CSS** – for the landing and input pages
+
+---
+
+## ⚙️ How It Works
+
+1. **User submits YouTube URL** via frontend
+2. **Transcript is fetched** using `YoutubeLoader`
+3. Transcript is **split into overlapping chunks**
+4. Each chunk is summarized using the LLM
+5. Summaries are combined into a **condensed context**
+6. LLM is prompted to:
+   - Generate a **title**
+   - Generate an **outline with subheadings**
+   - Iterate through each subheading and create content
+   - Generate a **summary**
+7. Final blog is returned in Markdown format with a **CTA**
+
+---
+
+## 🌟 Highlights & Thought Process
+
+- ✅ **Efficient Processing**: Instead of feeding the full transcript directly, it's split into manageable chunks for clarity and performance.
+- ✅ **Stored Intermediate Summaries**: Each chunk summary is stored and reused in the full blog context, optimizing API usage and maintaining coherence.
+- ✅ **Iterative Section Writing**: A `for` loop generates content for **each heading** in the outline. This ensures structure, relevance, and flow throughout the blog.
+- ✅ **Clean Prompt Engineering**: Carefully crafted prompts extract only the required content (title, sections, summary) with no extra fluff.
+- ✅ **Markdown-Based Output**: The result is well-structured Markdown, ready for publishing.
+- ✅ **Deployed on Render**: Easy to access, fast, and reliable hosting.
+
+---
+
+## 📁 File Structure
+
 ```bash
-git clone <repository-url>
-cd youtube-to-blog
+.
+├── app.py                  # Flask server
+├── templates/
+│   ├── landing.html        # Home/landing page
+│   └── index.html          # Blog generator form
+├── requirements.txt
+└── README.md
 ```
 
-2. Create a virtual environment and activate it:
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+### RUN LOCALLY 
 ```
-
-3. Install the required packages:
-```bash
+git clone https://github.com/mridulchdry17/youtube-blog-generator.git
+cd youtube-blog-generator
 pip install -r requirements.txt
-```
 
-4. Make sure Ollama is running and the gemma:2b model is available:
-```bash
-ollama pull gemma:2b
-```
+# Add your GROQ_API_KEY in a .env file
+touch .env
+echo "GROQ_API_KEY=your_api_key_here" > .env
 
-## Running the Application
-
-1. Start the Flask application:
-```bash
+# Run the server
 python app.py
 ```
 
-2. Open your web browser and navigate to:
-```
-http://localhost:5000
-```
+## 🙌 Future Ideas
+1) Add support for multi-language transcripts
 
-## Usage
+2) Style the blog using HTML rendering
 
-1. Enter a YouTube video URL in the input field
-2. Click "Generate Blog Post"
-3. Wait for the blog post to be generated
-4. The generated blog post will appear below the form
-5. Use the "Copy to Clipboard" button to copy the content
-
-## Note
-
-Make sure you have Ollama running locally with the gemma:2b model installed. The application requires an active internet connection to fetch YouTube video transcripts.
+3) Export blog as PDF or publish to Medium
